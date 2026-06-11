@@ -7,6 +7,7 @@ from datetime import timedelta
 
 @dataclass(frozen=True)
 class Config:
+    version: str
     octopus_base_url: str
     octopus_api_key: str
     product_code: str
@@ -36,6 +37,7 @@ def load_config() -> Config:
         product_code = product_from_tariff(tariff_code)
 
     return Config(
+        version=env("ENERGY_TRACKER_VERSION", "unknown"),
         octopus_base_url=env("OCTOPUS_BASE_URL", "https://api.octopus.energy/v1"),
         octopus_api_key=env("OCTOPUS_API_KEY", ""),
         product_code=product_code,

@@ -21,6 +21,7 @@ def main() -> int:
     signal.signal(signal.SIGTERM, stop)
 
     cfg = load_config()
+    LOG.info("starting energy-tracker version=%s", cfg.version)
     validate_config(cfg)
     clickhouse = ClickHouseClient(
         ClickHouseConfig(
