@@ -1,6 +1,6 @@
 # Energy Tracker
 
-Containerised Octopus Agile tariff poller for the home Nomad cluster. It polls
+Containerised Octopus Agile tariff poller for a Nomad cluster. It polls
 Octopus Energy half-hourly electricity tariff rates and stores them in
 ClickHouse for later analysis against weather, consumption, and prediction
 datasets.
@@ -12,7 +12,7 @@ public REST API, and ClickHouse is written through the HTTP interface.
 
 Required:
 
-- `OCTOPUS_TARIFF_CODE`, for example `E-1R-AGILE-FLEX-22-11-25-A`.
+- `OCTOPUS_TARIFF_CODE`, for example your active Octopus Agile import tariff code.
 
 Usually set explicitly:
 
@@ -38,14 +38,14 @@ Optional:
 
 ## ClickHouse Schema
 
-The table is created automatically. In the Nomad job, `OCTOPUS_CLICKHOUSE_CLUSTER`
-is set to `muthra_cluster`, so the service creates:
+The table is created automatically. When `OCTOPUS_CLICKHOUSE_CLUSTER` is set,
+the service creates:
 
 - `default.octopus_agile_rates_local` on the ClickHouse cluster
 - `default.octopus_agile_rates` as a Distributed table
 
-The Nomad job sets `OCTOPUS_CLICKHOUSE_TTL_DAYS=730`, so stored tariff rows are
-eligible for deletion two years after their `valid_to` timestamp.
+When `OCTOPUS_CLICKHOUSE_TTL_DAYS` is set, stored tariff rows are eligible for
+deletion after their `valid_to` timestamp plus the configured number of days.
 
 In a non-clustered local setup it creates:
 
@@ -60,7 +60,7 @@ ClickHouse merges.
 ## Local Run
 
 ```sh
-OCTOPUS_TARIFF_CODE=E-1R-AGILE-FLEX-22-11-25-A \
+OCTOPUS_TARIFF_CODE=<your-tariff-code> \
 CLICKHOUSE_HOST=127.0.0.1 \
 python -m octopus_agile_tracker.main
 ```
@@ -70,8 +70,8 @@ python -m octopus_agile_tracker.main
 ```sh
 docker build -t energy-tracker:dev .
 docker run --rm \
-  -e OCTOPUS_TARIFF_CODE=E-1R-AGILE-FLEX-22-11-25-A \
-  -e CLICKHOUSE_HOST=host.containers.internal \
+  -e OCTOPUS_TARIFF_CODE=<your-tariff-code> \
+  -e CLICKHOUSE_HOST=<clickhouse-host> \
   -e CLICKHOUSE_PORT=8123 \
   energy-tracker:dev
 ```
