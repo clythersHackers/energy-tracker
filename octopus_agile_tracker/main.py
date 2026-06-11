@@ -31,6 +31,7 @@ def main() -> int:
             user=cfg.clickhouse_user,
             password=cfg.clickhouse_password,
             cluster=cfg.clickhouse_cluster,
+            ttl_days=cfg.clickhouse_ttl_days,
             timeout_seconds=cfg.clickhouse_timeout_seconds,
         )
     )
@@ -61,6 +62,8 @@ def validate_config(cfg: Config) -> None:
         raise ValueError("CLICKHOUSE_DB is required")
     if not cfg.clickhouse_table:
         raise ValueError("OCTOPUS_CLICKHOUSE_TABLE or CLICKHOUSE_TABLE is required")
+    if cfg.clickhouse_ttl_days < 0:
+        raise ValueError("OCTOPUS_CLICKHOUSE_TTL_DAYS must be zero or greater")
 
 
 def poll_once(cfg: Config, octopus: OctopusClient, clickhouse: ClickHouseClient) -> None:

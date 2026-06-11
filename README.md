@@ -33,6 +33,7 @@ Optional:
 - `OCTOPUS_CLICKHOUSE_TABLE` or `CLICKHOUSE_TABLE`, default `octopus_agile_rates`.
 - `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD`, optional.
 - `OCTOPUS_CLICKHOUSE_CLUSTER` or `CLICKHOUSE_CLUSTER`, optional.
+- `OCTOPUS_CLICKHOUSE_TTL_DAYS` or `CLICKHOUSE_TTL_DAYS`, default `0` (disabled).
 - `CLICKHOUSE_TIMEOUT_SECONDS`, default `10`.
 
 ## ClickHouse Schema
@@ -42,6 +43,9 @@ is set to `muthra_cluster`, so the service creates:
 
 - `default.octopus_agile_rates_local` on the ClickHouse cluster
 - `default.octopus_agile_rates` as a Distributed table
+
+The Nomad job sets `OCTOPUS_CLICKHOUSE_TTL_DAYS=730`, so stored tariff rows are
+eligible for deletion two years after their `valid_to` timestamp.
 
 In a non-clustered local setup it creates:
 

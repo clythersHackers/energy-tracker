@@ -24,6 +24,7 @@ class Config:
     clickhouse_user: str
     clickhouse_password: str
     clickhouse_cluster: str
+    clickhouse_ttl_days: int
     clickhouse_timeout_seconds: float
 
 
@@ -51,6 +52,7 @@ def load_config() -> Config:
         clickhouse_user=env("CLICKHOUSE_USER", env("OCTOPUS_CLICKHOUSE_USER", "")),
         clickhouse_password=env("CLICKHOUSE_PASSWORD", env("OCTOPUS_CLICKHOUSE_PASSWORD", "")),
         clickhouse_cluster=env("OCTOPUS_CLICKHOUSE_CLUSTER", env("CLICKHOUSE_CLUSTER", "")),
+        clickhouse_ttl_days=int_env("OCTOPUS_CLICKHOUSE_TTL_DAYS", int_env("CLICKHOUSE_TTL_DAYS", 0)),
         clickhouse_timeout_seconds=float_env("CLICKHOUSE_TIMEOUT_SECONDS", 10.0),
     )
 
@@ -108,4 +110,3 @@ def region_from_tariff(tariff_code: str) -> str:
     if len(suffix) == 1 and suffix.isalpha():
         return suffix.upper()
     return ""
-

@@ -19,6 +19,7 @@ class ClickHouseConfig:
     user: str
     password: str
     cluster: str
+    ttl_days: int
     timeout_seconds: float
 
 
@@ -30,6 +31,7 @@ class ClickHouseClient:
     def ensure_schema(self) -> None:
         local_table = f"{self.cfg.table}_local"
         on_cluster = f" ON CLUSTER `{escape_ident(self.cfg.cluster)}`" if self.cfg.cluster else ""
+        ttl_clause = ttl_clause_for_days(self.cfg.ttl_days)
         schema = """
 (
     product_code LowCardinality(String),
@@ -48,7 +50,7 @@ class ClickHouseClient:
             f"CREATE TABLE IF NOT EXISTS {ident(self.cfg.database)}.{ident(local_table)}{on_cluster} {schema} "
             "ENGINE = ReplacingMergeTree(fetched_at) "
             "PARTITION BY toYYYYMM(valid_from) "
-            "ORDER BY (product_code, tariff_code, payment_method, valid_from, valid_to)"
+            f"ORDER BY (product_code, tariff_code, payment_method, valid_from, valid_to){ttl_clause}"
         )
         if self.cfg.cluster:
             main_sql = (
@@ -63,7 +65,7 @@ class ClickHouseClient:
                 f"AS {ident(self.cfg.database)}.{ident(local_table)} "
                 "ENGINE = ReplacingMergeTree(fetched_at) "
                 "PARTITION BY toYYYYMM(valid_from) "
-                "ORDER BY (product_code, tariff_code, payment_method, valid_from, valid_to)"
+                f"ORDER BY (product_code, tariff_code, payment_method, valid_from, valid_to){ttl_clause}"
             )
 
         self.execute(local_sql)
@@ -123,3 +125,9 @@ def escape_ident(value: str) -> str:
 
 def escape_string(value: str) -> str:
     return value.replace("\\", "\\\\").replace("'", "\\'")
+
+
+def ttl_clause_for_days(days: int) -> str:
+    if days <= 0:
+        return ""
+    return f" TTL valid_to + INTERVAL {days} DAY DELETE"
