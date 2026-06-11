@@ -1,0 +1,10 @@
+[project]
+name = "energy-tracker"
+version = "0.1.0"
+description = "Octopus Agile tariff poller for ClickHouse"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
