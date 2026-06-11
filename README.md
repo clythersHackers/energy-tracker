@@ -66,3 +66,9 @@ docker run --rm \
   energy-tracker:dev
 ```
 
+Version tags in the form `energy-tracker-<version>` are built by GitHub Actions
+and pushed to:
+
+```text
+ghcr.io/clythershackers/energy-tracker
+```
