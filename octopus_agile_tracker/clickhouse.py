@@ -19,6 +19,7 @@ class ClickHouseConfig:
     user: str
     password: str
     cluster: str
+    replicated: bool
     ttl_days: int
     timeout_seconds: float
 
@@ -32,6 +33,7 @@ class ClickHouseClient:
         local_table = f"{self.cfg.table}_local"
         on_cluster = f" ON CLUSTER `{escape_ident(self.cfg.cluster)}`" if self.cfg.cluster else ""
         ttl_clause = ttl_clause_for_days(self.cfg.ttl_days)
+        local_engine = local_engine_for_config(self.cfg, local_table)
         schema = """
 (
     product_code LowCardinality(String),
@@ -48,7 +50,7 @@ class ClickHouseClient:
 """.strip()
         local_sql = (
             f"CREATE TABLE IF NOT EXISTS {ident(self.cfg.database)}.{ident(local_table)}{on_cluster} {schema} "
-            "ENGINE = ReplacingMergeTree(fetched_at) "
+            f"ENGINE = {local_engine} "
             "PARTITION BY toYYYYMM(valid_from) "
             f"ORDER BY (product_code, tariff_code, payment_method, valid_from, valid_to){ttl_clause}"
         )
@@ -127,7 +129,21 @@ def escape_string(value: str) -> str:
     return value.replace("\\", "\\\\").replace("'", "\\'")
 
 
+def local_engine_for_config(cfg: ClickHouseConfig, local_table: str) -> str:
+    if cfg.cluster and cfg.replicated:
+        database = escape_string(cfg.database)
+        table = escape_string(local_table)
+        return (
+            "ReplicatedReplacingMergeTree("
+            f"'/clickhouse/tables/{{shard}}/{database}.{table}', "
+            "'{replica}', "
+            "fetched_at"
+            ")"
+        )
+    return "ReplacingMergeTree(fetched_at)"
+
+
 def ttl_clause_for_days(days: int) -> str:
     if days <= 0:
         return ""
-    return f" TTL valid_to + INTERVAL {days} DAY DELETE"
+    return f" TTL toDateTime(valid_to) + INTERVAL {days} DAY DELETE"

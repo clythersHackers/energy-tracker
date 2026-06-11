@@ -31,6 +31,7 @@ def main() -> int:
             user=cfg.clickhouse_user,
             password=cfg.clickhouse_password,
             cluster=cfg.clickhouse_cluster,
+            replicated=cfg.clickhouse_replicated,
             ttl_days=cfg.clickhouse_ttl_days,
             timeout_seconds=cfg.clickhouse_timeout_seconds,
         )
