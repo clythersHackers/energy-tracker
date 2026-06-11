@@ -37,7 +37,13 @@ Optional:
 
 ## ClickHouse Schema
 
-The table is created automatically. In a non-clustered setup it creates:
+The table is created automatically. In the Nomad job, `OCTOPUS_CLICKHOUSE_CLUSTER`
+is set to `muthra_cluster`, so the service creates:
+
+- `default.octopus_agile_rates_local` on the ClickHouse cluster
+- `default.octopus_agile_rates` as a Distributed table
+
+In a non-clustered local setup it creates:
 
 - `default.octopus_agile_rates_local`
 - `default.octopus_agile_rates`

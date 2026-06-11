@@ -27,6 +27,7 @@ job "energy-tracker" {
         CLICKHOUSE_INTERFACE = "http"
         CLICKHOUSE_PORT = "8123"
         CLICKHOUSE_DB   = "default"
+        OCTOPUS_CLICKHOUSE_CLUSTER = "muthra_cluster"
 
         # Set this to your active import tariff code, including region suffix.
         OCTOPUS_TARIFF_CODE = "E-1R-AGILE-FLEX-22-11-25-A"
