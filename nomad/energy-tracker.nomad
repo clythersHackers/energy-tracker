@@ -16,7 +16,7 @@ job "energy-tracker" {
       driver = "docker"
 
       config {
-        image = "ghcr.io/muthra-dev/energy-tracker:latest"
+        image = "ghcr.io/clythershackers/energy-tracker:latest"
         force_pull = true
         privileged = true
       }
@@ -42,4 +42,3 @@ job "energy-tracker" {
     }
   }
 }
-
